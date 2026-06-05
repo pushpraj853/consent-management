@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { LOGIN_ENDPOINT, SEND_OTP_ENDPOINT } from "@/configs/endpoints";
@@ -16,6 +16,7 @@ type LoginFormData = {
 
 const MOBILE_REGEX = /^[6-9]\d{9}$/;
 const OTP_REGEX = /^\d{6}$/;
+const RESEND_COOLDOWN_SECONDS = 30;
 
 const validateMobile = (mobile: string): string | undefined => {
   if (!mobile.trim()) {
@@ -43,6 +44,19 @@ const LoginContainer = () => {
   const [step, setStep] = useState<LoginStep>("mobile");
   const [formData, setFormData] = useState<LoginFormData>({ mobile: "", otp: "" });
   const [errors, setErrors] = useState<Partial<Record<keyof LoginFormData, string>>>({});
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  useEffect(() => {
+    if (step !== "otp" || resendCooldown <= 0) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setResendCooldown((prev) => (prev <= 1 ? 0 : prev - 1));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [step, resendCooldown]);
 
   const { makeApiCall: sendOtp, loading: sendingOtp } = useApiRequest<SendOtpResponseType>({
     endpointConfig: SEND_OTP_ENDPOINT,
@@ -91,6 +105,7 @@ const LoginContainer = () => {
     try {
       await sendOtp({ payload: { mobile: formData.mobile } });
       setStep("otp");
+      setResendCooldown(RESEND_COOLDOWN_SECONDS);
       setErrors({});
     } catch (error) {
       errorToast(error);
@@ -103,6 +118,10 @@ const LoginContainer = () => {
   };
 
   const handleResendOtp = async () => {
+    if (resendCooldown > 0 || loading) {
+      return;
+    }
+
     setFormData((prev) => ({ ...prev, otp: "" }));
     setErrors({});
     await requestOtp();
@@ -110,6 +129,7 @@ const LoginContainer = () => {
 
   const handleChangeNumber = () => {
     setStep("mobile");
+    setResendCooldown(0);
     setFormData((prev) => ({ ...prev, otp: "" }));
     setErrors({});
   };
@@ -139,6 +159,7 @@ const LoginContainer = () => {
       formData={formData}
       errors={errors}
       loading={loading}
+      resendCooldown={resendCooldown}
       onChange={handleChange}
       onSendOtp={handleSendOtp}
       onVerifyOtp={handleVerifyOtp}
