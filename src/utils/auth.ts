@@ -1,5 +1,5 @@
 import { PUBLIC_ROUTES_PATHS } from "../routes";
-import { store } from "../store";
+import { persistor, store } from "../store";
 import { clearUserCredential } from "../store/slices";
 import { showToast } from "./toasters";
 
@@ -36,22 +36,24 @@ export const isUserAuthenticated = () => {
   return true;
 };
 
-export const logout = (
+export const logout = async (
   navigate?: (
     pathname: string,
     options?: { replace?: boolean | undefined; state?: unknown },
   ) => void,
-): void => {
+): Promise<void> => {
   store.dispatch(clearUserCredential());
-  localStorage.clear();
+  await persistor.purge();
+
+  const loginPath = PUBLIC_ROUTES_PATHS?.LOGIN?.path;
 
   if (navigate) {
-    navigate(PUBLIC_ROUTES_PATHS?.LOGIN?.path, { replace: true });
+    navigate(loginPath, { replace: true });
     showToast({ message: "Logged out successfully", type: "success" });
+    return;
   }
-  // Redirect to login page if not already there
-  // This is to handle the case when the user is logged out from a different tab
-  if (!navigate && window.location.pathname !== PUBLIC_ROUTES_PATHS?.LOGIN?.path) {
-    window.location.href = PUBLIC_ROUTES_PATHS?.LOGIN?.path;
+
+  if (window.location.pathname !== loginPath) {
+    window.location.href = loginPath;
   }
 };

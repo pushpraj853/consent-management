@@ -6,7 +6,7 @@ const DashboardContainer = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout(navigate);
+    void logout(navigate);
   };
 
   return <Dashboard onLogout={handleLogout} />;
