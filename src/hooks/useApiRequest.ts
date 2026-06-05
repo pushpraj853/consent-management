@@ -66,7 +66,7 @@ const buildUrl = (
 // U is the type of the data returned from the API
 function useApiRequest<U>({
   endpointConfig,
-  hitApiOnMount = true,
+  hitApiOnMount = false,
   pathParams = [],
   queryParams = {},
   payload = {},
@@ -99,9 +99,9 @@ function useApiRequest<U>({
   const makeApiCall = useCallback(
     async (
       {
-        pathParams: callPathParams = pathParams,
-        queryParams: callQueryParams = queryParams,
-        payload: callPayload = payload,
+        pathParams: callPathParams,
+        queryParams: callQueryParams,
+        payload: callPayload,
       }: MakeApiCallOptions = {},
       signal?: AbortSignal,
     ): Promise<ApiResponse<U>> => {
@@ -153,7 +153,7 @@ function useApiRequest<U>({
               url: endPointUrl,
               attachToken: endpointConfig.attachToken,
               attachXUserId: endpointConfig.attachXUserId,
-              payload: callPayload,
+              payload,
               ...requestOptions,
             });
             break;
@@ -176,7 +176,7 @@ function useApiRequest<U>({
         }
       }
     },
-    [endpointConfig, handleError, pathParams, queryParams, payload],
+    [endpointConfig, handleError, payload],
   );
 
   const refetch = useCallback(
@@ -198,7 +198,7 @@ function useApiRequest<U>({
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
-    refetch().catch((error) => {
+    makeApiCall({ pathParams, queryParams, payload }, controller.signal).catch((error) => {
       if (isAbortError(error)) {
         return;
       }

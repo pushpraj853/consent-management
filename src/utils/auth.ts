@@ -1,4 +1,4 @@
-import { PUBLIC_ROUTES_PATHS } from "../routes/publicRoutes";
+import { PUBLIC_ROUTES_PATHS } from "../routes";
 import { store } from "../store";
 import { clearUserCredential } from "../store/slices";
 import { showToast } from "./toasters";
