@@ -1,7 +1,7 @@
 import { lazy } from "react";
 import { ProtectedRoutesType } from "../types";
 
-const Dashboard = lazy(() => import("../pages/protected/Dashboard"));
+const Dashboard = lazy(() => import("../pages/protected/dashboard"));
 const DashboardLayout = lazy(() => import("../layouts/dashboard-layout/DashboardLayout"));
 
 // Define protected route paths

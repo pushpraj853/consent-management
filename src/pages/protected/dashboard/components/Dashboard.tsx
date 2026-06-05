@@ -1,11 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { logout } from "../../utils/auth";
 
-const Dashboard = () => {
+type DashboardProps = {
+  onLogout: () => void;
+};
+
+const Dashboard = ({ onLogout }: DashboardProps) => {
   return (
     <>
       <div>Dashboard</div>
-      <Button variant="outline" onClick={() => logout()}>
+      <Button variant="outline" onClick={onLogout}>
         Logout
       </Button>
     </>

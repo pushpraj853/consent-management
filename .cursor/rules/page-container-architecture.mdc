@@ -1,0 +1,77 @@
+---
+description: Page container/component architecture — UI vs logic separation
+globs: src/pages/**/*
+alwaysApply: false
+---
+
+# Page Container/Component Architecture
+
+Each page lives in its own directory under `src/pages/`. Split UI from logic using `components/` and `container/`.
+
+## Directory Structure
+
+```
+src/pages/{scope}/{page-name}/
+  index.ts              # Re-exports container as default (route entry point)
+  container/
+    index.ts            # Re-exports container
+    {Page}Container.tsx # Logic: handlers, validation, API calls, state
+  components/
+    index.ts            # Re-exports UI components
+    {Page}.tsx          # Pure UI — no hooks, API calls, or business logic
+```
+
+## Responsibilities
+
+| Layer | Owns | Must NOT own |
+|-------|------|--------------|
+| **Component** | JSX, layout, styling, rendering props | `useState`, `useEffect`, API calls, validation, Redux dispatch |
+| **Container** | State, effects, handlers (`handleChange`, `handleSubmit`, `validate`), data fetching | Complex presentational markup |
+
+## Component Rules
+
+- Receive data and callbacks **only via props**
+- Name handlers as callbacks: `onLogout`, `onSubmit`, `onChange`
+- No imports from `store/`, `services/`, `hooks/` (except type-only imports)
+
+## Container Rules
+
+- Compose the UI component and wire all logic
+- Pass handlers and state down as props
+- Export as the page default via `index.ts`
+
+## Index Files
+
+Every subdirectory must have an `index.ts` that re-exports its public API. Routes lazy-load the page directory:
+
+```ts
+const Dashboard = lazy(() => import("../pages/protected/dashboard"));
+```
+
+## Shared / Reusable Code
+
+Before adding helpers, check existing locations:
+
+- `src/utils/` — auth, toasters, formatting
+- `src/hooks/` — reusable React hooks
+- `src/helpers/` — HTTP helpers
+- `src/components/shared/` — app-wide UI components
+
+Move logic here only when used across multiple pages or features.
+
+## Example
+
+```tsx
+// components/Login.tsx — UI only
+type LoginProps = { onLogin: () => void; loading: boolean };
+const Login = ({ onLogin, loading }: LoginProps) => (
+  <Button onClick={onLogin} disabled={loading}>Login</Button>
+);
+
+// container/LoginContainer.tsx — logic
+const LoginContainer = () => {
+  const { makeApiCall: login, loading } = useApiRequest(...);
+  const handleLogin = async () => { /* ... */ };
+  return <Login onLogin={handleLogin} loading={loading} />;
+};
+```
