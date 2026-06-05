@@ -1,6 +1,7 @@
 import { ApiResponse } from "./../types/index";
-import { X_API_KEY } from "../configs";
+import { USE_MOCK_API, X_API_KEY } from "../configs/envoirmentVars";
 import { decodeJWTToken, getToken, logout } from "../utils";
+import { handleMockAuthRequest, isMockAuthEndpoint } from "./mock-auth-service";
 
 export enum httpType {
   GET = "GET",
@@ -127,6 +128,13 @@ export const makePostRequest = async <T>({
   payload = {},
   signal,
 }: PostRequestOptions): Promise<ApiResponse<T>> => {
+  if (USE_MOCK_API && isMockAuthEndpoint(url)) {
+    if (signal?.aborted) {
+      throw new DOMException("Aborted", "AbortError");
+    }
+    return handleMockAuthRequest<T>(url, payload);
+  }
+
   const headers = createRequestHeader(attachToken, attachXUserId);
 
   const response = await fetch(url, {

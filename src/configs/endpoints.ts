@@ -7,8 +7,22 @@ export interface EndpointConfigType {
   attachXUserId?: boolean;
 }
 
+export const SEND_OTP_ENDPOINT: EndpointConfigType = {
+  endpoint: "/auth/send-otp",
+  httpType: httpType.POST,
+  attachToken: false,
+  attachXUserId: false,
+};
+
 export const LOGIN_ENDPOINT: EndpointConfigType = {
   endpoint: "/auth/login",
+  httpType: httpType.POST,
+  attachToken: false,
+  attachXUserId: false,
+};
+
+export const FORGOT_PASSWORD_ENDPOINT: EndpointConfigType = {
+  endpoint: "/auth/forgot-password",
   httpType: httpType.POST,
   attachToken: false,
   attachXUserId: false,

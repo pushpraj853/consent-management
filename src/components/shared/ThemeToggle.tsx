@@ -3,6 +3,7 @@ import { MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
+import { themeConfig } from "@/config/theme";
 import { cn } from "@/lib/utils";
 
 const ThemeToggle = ({ className }: { className?: string }) => {
@@ -12,6 +13,10 @@ const ThemeToggle = ({ className }: { className?: string }) => {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  if (!themeConfig.showThemeToggle) {
+    return null;
+  }
 
   const toggleTheme = () => {
     setTheme(resolvedTheme === "dark" ? "light" : "dark");

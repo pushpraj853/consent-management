@@ -9,7 +9,8 @@ const ThemeProvider = ({ children, ...props }: ThemeProviderProps) => {
     <NextThemesProvider
       attribute="class"
       defaultTheme={themeConfig.defaultTheme}
-      enableSystem
+      enableSystem={themeConfig.enableSystem}
+      forcedTheme={themeConfig.showThemeToggle ? undefined : themeConfig.defaultTheme}
       disableTransitionOnChange
       {...props}
     >

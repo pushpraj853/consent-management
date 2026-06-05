@@ -1,0 +1,61 @@
+---
+description: Shared component architecture — components/ + container/ per feature
+globs: src/components/shared/**/*
+alwaysApply: false
+---
+
+# Shared Component Architecture
+
+Mirror the page pattern: each reusable feature gets its own directory under `src/components/shared/` with `components/` and `container/` when logic is needed.
+
+## Directory Structure
+
+```
+src/components/shared/{feature}/
+  index.ts                  # Public API — export container as default entry when applicable
+  {feature}.utils.ts        # Constants, config maps, pure helpers (no JSX)
+  components/
+    index.ts
+    {SubPiece}.tsx          # Small presentational pieces (CountryFlag, CountryDialCode)
+    {Feature}.tsx           # Pure UI — props in, JSX out
+  container/
+    index.ts
+    {Feature}Container.tsx  # Sanitization, defaults, wiring — only when needed
+```
+
+## Responsibilities
+
+| Layer | Owns | Must NOT own |
+|-------|------|--------------|
+| **Component** | Layout, styling, rendering props | API calls, Redux, feature business rules |
+| **Container** | Input normalization, default config, composing child components | Heavy presentational markup |
+| **Utils** | Country config, masks, validators | React hooks or JSX |
+
+## Assets
+
+- Flags, icons, illustrations → `src/assets/` (e.g. `src/assets/flags/in.svg`)
+- Reference assets from a config map in `{feature}.utils.ts`, not inline SVG in components
+- Adding a country = add asset file + extend `COUNTRY_CONFIG`
+
+## Rules
+
+- One feature per folder (`phone-number/`, not nested under `auth/` unless auth-specific)
+- Consumers import from the feature root: `@/components/shared/phone-number`
+- Sub-pieces get their own file in `components/` when reused or independently styled
+- Use `container/` only when the UI component would otherwise own non-presentational logic
+- `src/components/ui/` stays design-system primitives — do not put feature code there
+
+## Example
+
+```tsx
+// components/PhoneNumberInput.tsx — UI only
+const PhoneNumberInput = ({ value, onChange }) => ( ... );
+
+// container/PhoneNumberInputContainer.tsx — sanitization
+const PhoneNumberInputContainer = ({ onChange, ...props }) => (
+  <PhoneNumberInput {...props} onChange={(v) => onChange(sanitizePhoneDigits(v))} />
+);
+
+// index.ts
+export { default as PhoneNumberInput } from "./container/PhoneNumberInputContainer";
+```

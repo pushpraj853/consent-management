@@ -9,7 +9,9 @@ export const themeConfig = {
   iconLibrary: "lucide",
   menuAccent: "subtle",
   menuColor: "default",
-  defaultTheme: "system",
+  defaultTheme: "light",
+  enableSystem: false,
+  showThemeToggle: false,
 } as const;
 
 export type ThemeConfig = typeof themeConfig;
