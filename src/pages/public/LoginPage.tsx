@@ -15,7 +15,7 @@ const LoginPage = () => {
     hitApiOnMount: false,
   });
 
-  const _completeAuthorization = (data: AuthResponseType) => {
+  const completeAuthorization = (data: AuthResponseType) => {
     const reduxData = {
       token: data?.accessToken,
       user: {
@@ -33,14 +33,14 @@ const LoginPage = () => {
     });
   };
 
-  const _login = async () => {
+  const handleLogin = async () => {
     try {
       const payload = {
         username: "emilys",
         password: "emilyspass",
       };
       const response = await login({ payload });
-      _completeAuthorization(response.data);
+      completeAuthorization(response.data);
     } catch (error) {
       errorToast(error);
     }
@@ -49,7 +49,7 @@ const LoginPage = () => {
   return (
     <div>
       Login
-      <button onClick={() => _login()} disabled={loading}>
+      <button onClick={handleLogin} disabled={loading}>
         Login
       </button>
     </div>

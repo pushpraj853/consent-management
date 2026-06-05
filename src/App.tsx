@@ -8,7 +8,7 @@ import { PUBLIC_ROUTES_PATHS } from "./routes/publicRoutes";
 import ErrorBoundary from "./components/shared/ErrorBoundary";
 
 const App = () => {
-  const _renderRoutes = <T extends BaseRouteType>(routes: T[]): React.ReactNode[] => {
+  const renderRoutes = <T extends BaseRouteType>(routes: T[]): React.ReactNode[] => {
     return routes.map(({ path, element: Page, layout, userRole, children }) => {
       const Layout = layout ?? Fragment;
       return (
@@ -29,7 +29,7 @@ const App = () => {
             )
           }
         >
-          {children?.length ? _renderRoutes(children) : null}
+          {children?.length ? renderRoutes(children) : null}
         </Route>
       );
     });
@@ -46,18 +46,18 @@ const App = () => {
                 <PublicRoutesWrapper redirectRoute={PROTECTED_ROUTES_PATHS.DASHBOARD.path} />
               }
             >
-              {_renderRoutes(publicRoutes)}
+              {renderRoutes(publicRoutes)}
             </Route>
 
             {/* Protected Routes */}
             <Route
               element={<ProtectedRoutesWrapper redirectRoute={PUBLIC_ROUTES_PATHS?.LOGIN?.path} />}
             >
-              {_renderRoutes(protectedRoutes)}
+              {renderRoutes(protectedRoutes)}
             </Route>
 
             {/* Shared Routes */}
-            <Route>{_renderRoutes(sharedRoutes)}</Route>
+            <Route>{renderRoutes(sharedRoutes)}</Route>
 
             {/* Catch-all */}
             <Route path="*" element={<Navigate to={PUBLIC_ROUTES_PATHS?.LOGIN?.path} replace />} />

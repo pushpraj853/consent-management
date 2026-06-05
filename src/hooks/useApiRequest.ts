@@ -82,7 +82,7 @@ function useApiRequest<U>({
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const _handleError = useCallback(
+  const handleError = useCallback(
     (error: unknown, signal?: AbortSignal): never => {
       if (signal?.aborted || isAbortError(error)) {
         throw error;
@@ -177,14 +177,14 @@ function useApiRequest<U>({
         setData(result);
         return result;
       } catch (error) {
-        return _handleError(error, signal);
+        return handleError(error, signal);
       } finally {
         if (!signal?.aborted) {
           setLoading(false);
         }
       }
     },
-    [endpointConfig, _handleError, pathParams, queryParams, payload]
+    [endpointConfig, handleError, pathParams, queryParams, payload]
   );
 
   const refetch = useCallback(

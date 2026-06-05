@@ -78,7 +78,7 @@ const formatResultToTypeMatch = <T>(result: ApiResponse<T>): ApiResponse<T> => {
   } as ApiResponse<T>;
 };
 
-const _handleApiResponse = async <T>(response: Response): Promise<ApiResponse<T>> => {
+const handleApiResponse = async <T>(response: Response): Promise<ApiResponse<T>> => {
   if (response.status === 401) {
     logout();
     throw new Error("Unauthorized access. Please login again.");
@@ -116,7 +116,7 @@ export const makeGetRequest = async <T>({
     signal,
   });
 
-  const result: ApiResponse<T> = await _handleApiResponse<T>(response);
+  const result: ApiResponse<T> = await handleApiResponse<T>(response);
   return result;
 };
 
@@ -136,7 +136,7 @@ export const makePostRequest = async <T>({
     signal,
   });
 
-  const result: ApiResponse<T> = await _handleApiResponse<T>(response);
+  const result: ApiResponse<T> = await handleApiResponse<T>(response);
   return result;
 };
 
@@ -156,7 +156,7 @@ export const makePutRequest = async <T>({
     signal,
   });
 
-  const result: ApiResponse<T> = await _handleApiResponse<T>(response);
+  const result: ApiResponse<T> = await handleApiResponse<T>(response);
   return result;
 };
 
@@ -176,6 +176,6 @@ export const makeDeleteRequest = async <T>({
     signal,
   });
 
-  const result: ApiResponse<T> = await _handleApiResponse<T>(response);
+  const result: ApiResponse<T> = await handleApiResponse<T>(response);
   return result;
 };

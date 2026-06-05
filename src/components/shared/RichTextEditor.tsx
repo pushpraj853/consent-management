@@ -22,7 +22,7 @@ const TextEditor = ({
   const quillRef = useRef<ReactQuill>(null);
   const [mounted, setMounted] = useState(false);
 
-  const _modules = {
+  const quillModules = {
     toolbar: [
       [{ header: [1, 2, false] }],
       ["bold", "italic", "underline", "strike", "blockquote"],
@@ -30,7 +30,7 @@ const TextEditor = ({
     ],
   };
 
-  const _formats = [
+  const quillFormats = [
     "header",
     "bold",
     "italic",
@@ -42,11 +42,11 @@ const TextEditor = ({
     "indent",
   ];
 
-  const _onBlur = () => {
+  const handleBlur = () => {
     onBlur();
   };
 
-  const _handleChange = (value: string) => {
+  const handleChange = (value: string) => {
     onChange(value);
   };
 
@@ -64,12 +64,12 @@ const TextEditor = ({
       <ReactQuill
         ref={quillRef}
         value={content || ""}
-        onChange={_handleChange}
+        onChange={handleChange}
         className="editor"
-        modules={readOnly ? {} : _modules}
-        formats={_formats}
+        modules={readOnly ? {} : quillModules}
+        formats={quillFormats}
         placeholder={placeholder || ""}
-        onBlur={_onBlur}
+        onBlur={handleBlur}
         readOnly={disabled || readOnly || false}
         theme="snow"
       />
