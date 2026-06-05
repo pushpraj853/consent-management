@@ -14,6 +14,13 @@ export const LOGIN_ENDPOINT: EndpointConfigType = {
   attachXUserId: false,
 };
 
+export const LOGOUT_ENDPOINT: EndpointConfigType = {
+  endpoint: "/auth/logout",
+  httpType: httpType.POST,
+  attachToken: true,
+  attachXUserId: false,
+};
+
 export const USER_LIST_ENDPOINT: EndpointConfigType = {
   endpoint: "/users",
   httpType: httpType.GET,

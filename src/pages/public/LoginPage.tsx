@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { LOGIN_ENDPOINT } from "../../configs/endpoints";
 import { AuthResponseType } from "../../types";
@@ -49,9 +50,9 @@ const LoginPage = () => {
   return (
     <div>
       Login Page
-      <button onClick={handleLogin} disabled={loading}>
-        Login
-      </button>
+      <Button onClick={handleLogin} disabled={loading}>
+        {loading ? "Logging in..." : "Login"}
+      </Button>
     </div>
   );
 };

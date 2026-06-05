@@ -9,7 +9,8 @@ import {
   PROTECTED_ROUTES_PATHS,
 } from "./routes";
 import { BaseRouteType } from "./types";
-import { ErrorBoundary, ToasterWrapper } from "./components/shared";
+import { Toaster } from "@/components/ui/sonner";
+import { ErrorBoundary, ThemeProvider, ToasterWrapper } from "./components/shared";
 
 const App = () => {
   const renderRoutes = <T extends BaseRouteType>(routes: T[]): React.ReactNode[] => {
@@ -38,11 +39,13 @@ const App = () => {
   };
 
   return (
-    <BrowserRouter>
-      <ErrorBoundary>
-        <Suspense fallback={<div>Loading...</div>}>
-          <ToasterWrapper />
-          <Routes>
+    <ThemeProvider>
+      <BrowserRouter>
+        <ErrorBoundary>
+          <Suspense fallback={<div>Loading...</div>}>
+            <ToasterWrapper />
+            <Toaster richColors closeButton />
+            <Routes>
             {/* Public Routes */}
             <Route
               element={
@@ -64,10 +67,11 @@ const App = () => {
 
             {/* Catch-all */}
             <Route path="*" element={<Navigate to={PUBLIC_ROUTES_PATHS?.LOGIN?.path} replace />} />
-          </Routes>
-        </Suspense>
-      </ErrorBoundary>
-    </BrowserRouter>
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 };
 

@@ -1,4 +1,6 @@
 export { default as ErrorBoundary } from "./ErrorBoundary";
+export { default as ThemeProvider } from "./ThemeProvider";
+export { default as ThemeToggle } from "./ThemeToggle";
 export { default as ToasterWrapper } from "./ToasterWrapper";
 export { default as SmallSpinner } from "./SmallSpinner";
 export { default as RichTextEditor } from "./RichTextEditor";

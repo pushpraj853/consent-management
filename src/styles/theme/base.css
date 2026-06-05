@@ -1,0 +1,19 @@
+@layer base {
+  *,
+  *::before,
+  *::after {
+    @apply box-border border-border outline-ring/50;
+  }
+
+  html {
+    @apply h-full font-sans;
+  }
+
+  body {
+    @apply min-h-svh antialiased bg-background text-foreground;
+  }
+
+  #root {
+    @apply min-h-svh;
+  }
+}
