@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { LOGIN_ENDPOINT } from "../../configs/endpoints";
-import useApiRequest from "../../hooks/useApiRequest";
 import { AuthResponseType } from "../../types";
 import { errorToast } from "../../utils";
-import { PROTECTED_ROUTES_PATHS } from "../../routes/protectedRoutes";
+import { PROTECTED_ROUTES_PATHS } from "../../routes";
 import { useDispatch } from "react-redux";
-import { addUserCredential } from "../../store/slices/userCredentialSlice";
+import { addUserCredential } from "../../store/slices";
+import { useApiRequest } from "../../hooks";
 
 const LoginPage = () => {
   const navigate = useNavigate();
