@@ -6,7 +6,7 @@ import { useApiRequest } from "@/hooks";
 import { PROTECTED_ROUTES_PATHS } from "@/routes";
 import { addUserCredential } from "@/store/slices";
 import { AuthResponseType, SendOtpResponseType } from "@/types";
-import { errorToast } from "@/utils";
+import { errorToast, successToast } from "@/utils";
 import Login, { LoginStep } from "../components/Login";
 
 type LoginFormData = {
@@ -92,6 +92,7 @@ const LoginContainer = () => {
         },
       }),
     );
+    successToast("Logged in successfully");
     navigate(PROTECTED_ROUTES_PATHS.DASHBOARD.path, { replace: true });
   };
 

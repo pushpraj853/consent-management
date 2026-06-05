@@ -62,20 +62,13 @@ const OtpInput = ({
     [focusInput, length, onChange, onComplete],
   );
 
-  const handleDigitChange = (index: number, raw: string) => {
-    const digitOnly = raw.replace(/\D/g, "");
-
-    if (digitOnly.length > 1) {
-      applyOtp(digitOnly);
-      return;
-    }
-
+  const updateDigit = (index: number, digit: string) => {
     const nextDigits = [...digits];
-    nextDigits[index] = digitOnly;
+    nextDigits[index] = digit;
     const nextValue = nextDigits.join("").slice(0, length);
     onChange(nextValue);
 
-    if (digitOnly && index < length - 1) {
+    if (digit && index < length - 1) {
       focusInput(index + 1);
     }
 
@@ -84,7 +77,24 @@ const OtpInput = ({
     }
   };
 
+  const handleDigitChange = (index: number, raw: string) => {
+    const digitOnly = raw.replace(/\D/g, "");
+
+    if (digitOnly.length > 1) {
+      applyOtp(digitOnly);
+      return;
+    }
+
+    updateDigit(index, digitOnly);
+  };
+
   const handleKeyDown = (index: number, event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (/^\d$/.test(event.key)) {
+      event.preventDefault();
+      updateDigit(index, event.key);
+      return;
+    }
+
     if (event.key === "Backspace") {
       event.preventDefault();
 
