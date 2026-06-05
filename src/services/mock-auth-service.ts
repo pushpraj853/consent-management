@@ -1,3 +1,4 @@
+import { PERMISSIONS } from "@/constants/permissions";
 import {
   AuthResponseType,
   ForgotPasswordRequestType,
@@ -21,6 +22,13 @@ const createMockToken = (identifier: string): string => {
       sub: "mock-user-1",
       mobile: identifier,
       userRole: "admin",
+      permissions: [
+        PERMISSIONS.MY_CONSENTS.VIEW,
+        PERMISSIONS.MY_CONSENTS.EDIT,
+        PERMISSIONS.AUDIT_TRAILS.VIEW,
+        PERMISSIONS.AUDIT_TRAILS.EDIT,
+        PERMISSIONS.USER_PROFILE.EDIT,
+      ],
       exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7,
     }),
   );

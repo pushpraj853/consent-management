@@ -93,7 +93,7 @@ const LoginContainer = () => {
       }),
     );
     successToast("Logged in successfully");
-    navigate(PROTECTED_ROUTES_PATHS.DASHBOARD.path, { replace: true });
+    navigate(PROTECTED_ROUTES_PATHS.MY_CONSENTS.path, { replace: true });
   };
 
   const requestOtp = async () => {

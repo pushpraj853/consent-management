@@ -1,6 +1,6 @@
 import { Fragment, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { ProtectedRoutesWrapper, PublicRoutesWrapper, AccessGuard } from "./guards";
+import { ProtectedRoutesWrapper, PublicRoutesWrapper, AccessGuard, PermissionGuard } from "./guards";
 import {
   protectedRoutes,
   publicRoutes,
@@ -10,27 +10,31 @@ import {
 } from "./routes";
 import { BaseRouteType } from "./types";
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { ErrorBoundary, ThemeProvider, ToasterWrapper } from "./components/shared";
 
 const App = () => {
   const renderRoutes = <T extends BaseRouteType>(routes: T[]): React.ReactNode[] => {
-    return routes.map(({ path, element: Page, layout, userRole, children }) => {
+    return routes.map(({ path, element: Page, layout, userRole, permission, children }) => {
       const Layout = layout ?? Fragment;
+
+      const page = (
+        <PermissionGuard permission={permission}>
+          {userRole?.length ? (
+            <AccessGuard allowedRoles={userRole}>
+              <Page />
+            </AccessGuard>
+          ) : (
+            <Page />
+          )}
+        </PermissionGuard>
+      );
+
       return (
         <Route
           key={path}
           path={path}
-          element={
-            <Layout>
-              {userRole?.length ? (
-                <AccessGuard allowedRoles={userRole}>
-                  <Page />
-                </AccessGuard>
-              ) : (
-                <Page />
-              )}
-            </Layout>
-          }
+          element={<Layout>{page}</Layout>}
         >
           {children?.length ? renderRoutes(children) : null}
         </Route>
@@ -40,6 +44,7 @@ const App = () => {
 
   return (
     <ThemeProvider>
+      <TooltipProvider>
       <BrowserRouter>
         <ErrorBoundary>
           <Suspense fallback={<div>Loading...</div>}>
@@ -49,7 +54,7 @@ const App = () => {
             {/* Public Routes */}
             <Route
               element={
-                <PublicRoutesWrapper redirectRoute={PROTECTED_ROUTES_PATHS.DASHBOARD.path} />
+                <PublicRoutesWrapper redirectRoute={PROTECTED_ROUTES_PATHS.MY_CONSENTS.path} />
               }
             >
               {renderRoutes(publicRoutes)}
@@ -71,6 +76,7 @@ const App = () => {
           </Suspense>
         </ErrorBoundary>
       </BrowserRouter>
+      </TooltipProvider>
     </ThemeProvider>
   );
 };
