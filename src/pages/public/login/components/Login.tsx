@@ -1,8 +1,8 @@
 import { AuthFormCard } from "@/components/shared/auth";
 import {
   COUNTRY_CONFIG,
-  DEFAULT_COUNTRY,
   maskPhoneNumber,
+  SupportedCountry,
 } from "@/components/shared/phone-number";
 import LoginMobileStep from "./LoginMobileStep";
 import LoginOtpStep from "./LoginOtpStep";
@@ -10,17 +10,19 @@ import LoginOtpStep from "./LoginOtpStep";
 export type LoginStep = "mobile" | "otp";
 
 type LoginFormData = {
-  mobile: string;
+  phoneNumber: string;
   otp: string;
 };
 
 type LoginProps = {
   step: LoginStep;
   formData: LoginFormData;
+  country: SupportedCountry;
   errors: Partial<Record<keyof LoginFormData, string>>;
   loading: boolean;
   resendCooldown: number;
   onChange: (field: keyof LoginFormData, value: string) => void;
+  onCountryChange: (country: SupportedCountry) => void;
   onSendOtp: (e: React.FormEvent) => void;
   onVerifyOtp: (e: React.FormEvent) => void;
   onResendOtp: () => void;
@@ -30,10 +32,12 @@ type LoginProps = {
 const Login = ({
   step,
   formData,
+  country,
   errors,
   loading,
   resendCooldown,
   onChange,
+  onCountryChange,
   onSendOtp,
   onVerifyOtp,
   onResendOtp,
@@ -48,7 +52,7 @@ const Login = ({
         <span>
           Enter the code sent to{" "}
           <span className="font-medium text-foreground tabular-nums">
-            {COUNTRY_CONFIG[DEFAULT_COUNTRY].dialCode} {maskPhoneNumber(formData.mobile)}
+            {COUNTRY_CONFIG[country].dialCode} {maskPhoneNumber(formData.phoneNumber)}
           </span>{" "}
           to continue.
         </span>
@@ -57,10 +61,12 @@ const Login = ({
   >
     {step === "mobile" ? (
       <LoginMobileStep
-        mobile={formData.mobile}
-        error={errors.mobile}
+        phoneNumber={formData.phoneNumber}
+        country={country}
+        error={errors.phoneNumber}
         loading={loading}
-        onMobileChange={(value) => onChange("mobile", value)}
+        onPhoneNumberChange={(value) => onChange("phoneNumber", value)}
+        onCountryChange={onCountryChange}
         onSubmit={onSendOtp}
       />
     ) : (

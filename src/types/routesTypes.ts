@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import type { Permission } from "@/constants/permissions";
 
 export interface BaseRouteType {
   path: string;
@@ -11,7 +10,6 @@ export interface BaseRouteType {
   breadcrumb?: string; // used for breadcrumbs
   children?: ProtectedRoutesType[]; // nested routes
   userRole?: string[]; // optional: access control,  Example: ["admin", "team-member"]
-  permission?: Permission; // optional: permission required to access route
 }
 export type PublicRoutesType = BaseRouteType;
 export type ProtectedRoutesType = BaseRouteType;

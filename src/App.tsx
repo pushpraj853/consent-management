@@ -1,6 +1,6 @@
 import { Fragment, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { ProtectedRoutesWrapper, PublicRoutesWrapper, AccessGuard, PermissionGuard } from "./guards";
+import { ProtectedRoutesWrapper, PublicRoutesWrapper, AccessGuard } from "./guards";
 import {
   protectedRoutes,
   publicRoutes,
@@ -15,19 +15,15 @@ import { ErrorBoundary, ThemeProvider, ToasterWrapper } from "./components/share
 
 const App = () => {
   const renderRoutes = <T extends BaseRouteType>(routes: T[]): React.ReactNode[] => {
-    return routes.map(({ path, element: Page, layout, userRole, permission, children }) => {
+    return routes.map(({ path, element: Page, layout, userRole, children }) => {
       const Layout = layout ?? Fragment;
 
-      const page = (
-        <PermissionGuard permission={permission}>
-          {userRole?.length ? (
-            <AccessGuard allowedRoles={userRole}>
-              <Page />
-            </AccessGuard>
-          ) : (
-            <Page />
-          )}
-        </PermissionGuard>
+      const page = userRole?.length ? (
+        <AccessGuard allowedRoles={userRole}>
+          <Page />
+        </AccessGuard>
+      ) : (
+        <Page />
       );
 
       return (

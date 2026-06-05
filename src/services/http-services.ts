@@ -1,7 +1,6 @@
 import { ApiResponse } from "./../types/index";
-import { USE_MOCK_API, X_API_KEY } from "../configs/envoirmentVars";
-import { decodeJWTToken, getToken, logout } from "../utils";
-import { handleMockAuthRequest, isMockAuthEndpoint } from "./mock-auth-service";
+import { X_API_KEY } from "../configs/envoirmentVars";
+import { decodeJWTToken, getToken, getUserId, logout } from "../utils";
 
 export enum httpType {
   GET = "GET",
@@ -31,6 +30,13 @@ interface DeleteRequestOptions extends BaseRequestOptions {
 
 type Headers = Record<string, string>;
 
+type RawApiResponse<T> = {
+  success?: boolean;
+  message?: string;
+  data?: T;
+  error?: boolean;
+};
+
 const createRequestHeader = (attachToken = false, attachXUserId = false): Headers => {
   const headers: Headers = {
     Accept: "application/json",
@@ -45,8 +51,10 @@ const createRequestHeader = (attachToken = false, attachXUserId = false): Header
 
     if (attachXUserId) {
       const decodedToken = decodeJWTToken(authToken);
-      if (decodedToken?.sub) {
-        headers["x-user-id"] = decodedToken.sub.trim();
+      const userId = decodedToken?.sub?.trim() ?? getUserId();
+
+      if (userId) {
+        headers["x-user-id"] = userId;
       } else {
         throw new Error("Error fetching x-user-id from token");
       }
@@ -68,37 +76,68 @@ export const structureQueryParams = (params: Record<string, unknown>): string =>
   return queryStrings;
 };
 
-// this function is just to make sure that the result is of type ApiResponse<T>,
-// it is not doing any transformation to the result, just making sure that the type is correct
-//! SHOULD BE REMOVED once we have a proper response structure from the server
-const formatResultToTypeMatch = <T>(result: ApiResponse<T>): ApiResponse<T> => {
-  return {
-    data: result ? { ...result } : null,
-    message: "success",
-    error: false,
-  } as ApiResponse<T>;
+const normalizeApiResponse = <T>(result: RawApiResponse<T>): ApiResponse<T> => {
+  if (result.success === false || result.error === true) {
+    throw new Error(result.message ?? "Something went wrong on the server.");
+  }
+
+  if (result.success === true) {
+    return {
+      data: (result.data ?? {}) as T,
+      message: result.message ?? "OK",
+      error: false,
+    };
+  }
+
+  if (result.data !== undefined) {
+    return {
+      data: result.data,
+      message: result.message ?? "success",
+      error: false,
+    };
+  }
+
+  throw new Error(result.message ?? "Something went wrong on the server.");
 };
 
-const handleApiResponse = async <T>(response: Response): Promise<ApiResponse<T>> => {
+const parseErrorMessage = async (response: Response, fallback: string): Promise<string> => {
+  try {
+    const body = (await response.json()) as RawApiResponse<unknown>;
+    return body.message ?? fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const handleApiResponse = async <T>(
+  response: Response,
+  attachToken = false,
+): Promise<ApiResponse<T>> => {
   if (response.status === 401) {
-    logout();
-    throw new Error("Unauthorized access. Please login again.");
-  } else if (response.status === 403) {
-    throw new Error("Forbidden access. You don't have permission to access this resource.");
-  } else if (response.status >= 500) {
-    throw new Error("Server error. Please try again later.");
-  } else if (response.status >= 400) {
-    throw new Error("Client error. Please check your request.");
-  } else if (response?.status == 404) {
-    throw new Error("Page Not Found");
+    if (attachToken) {
+      logout();
+    }
+    throw new Error(await parseErrorMessage(response, "Unauthorized access."));
   }
 
-  const result: ApiResponse<T> = await response.json();
-  if (result?.error) {
-    throw new Error(result?.message ?? "Something went wrong on the server.");
+  if (response.status === 403) {
+    throw new Error(await parseErrorMessage(response, "Forbidden access. You don't have permission to access this resource."));
   }
 
-  return formatResultToTypeMatch(result) as ApiResponse<T>;
+  if (response.status === 404) {
+    throw new Error(await parseErrorMessage(response, "Page Not Found"));
+  }
+
+  if (response.status >= 500) {
+    throw new Error(await parseErrorMessage(response, "Server error. Please try again later."));
+  }
+
+  if (response.status >= 400) {
+    throw new Error(await parseErrorMessage(response, "Client error. Please check your request."));
+  }
+
+  const result = (await response.json()) as RawApiResponse<T>;
+  return normalizeApiResponse(result);
 };
 
 export const makeGetRequest = async <T>({
@@ -117,8 +156,7 @@ export const makeGetRequest = async <T>({
     signal,
   });
 
-  const result: ApiResponse<T> = await handleApiResponse<T>(response);
-  return result;
+  return handleApiResponse<T>(response, attachToken);
 };
 
 export const makePostRequest = async <T>({
@@ -128,13 +166,6 @@ export const makePostRequest = async <T>({
   payload = {},
   signal,
 }: PostRequestOptions): Promise<ApiResponse<T>> => {
-  if (USE_MOCK_API && isMockAuthEndpoint(url)) {
-    if (signal?.aborted) {
-      throw new DOMException("Aborted", "AbortError");
-    }
-    return handleMockAuthRequest<T>(url, payload);
-  }
-
   const headers = createRequestHeader(attachToken, attachXUserId);
 
   const response = await fetch(url, {
@@ -144,8 +175,7 @@ export const makePostRequest = async <T>({
     signal,
   });
 
-  const result: ApiResponse<T> = await handleApiResponse<T>(response);
-  return result;
+  return handleApiResponse<T>(response, attachToken);
 };
 
 export const makePutRequest = async <T>({
@@ -164,8 +194,7 @@ export const makePutRequest = async <T>({
     signal,
   });
 
-  const result: ApiResponse<T> = await handleApiResponse<T>(response);
-  return result;
+  return handleApiResponse<T>(response, attachToken);
 };
 
 export const makeDeleteRequest = async <T>({
@@ -184,6 +213,5 @@ export const makeDeleteRequest = async <T>({
     signal,
   });
 
-  const result: ApiResponse<T> = await handleApiResponse<T>(response);
-  return result;
+  return handleApiResponse<T>(response, attachToken);
 };

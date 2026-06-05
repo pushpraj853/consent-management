@@ -1,12 +1,10 @@
-import { UserDataType } from "./userDataTypes";
-
 export interface LoginRequestType {
-  mobile: string;
+  phoneNumber: string;
   otp: string;
 }
 
 export interface SendOtpRequestType {
-  mobile: string;
+  phoneNumber: string;
 }
 
 export interface SendOtpResponseType {
@@ -17,9 +15,14 @@ export interface ForgotPasswordRequestType {
   email: string;
 }
 
-export interface AuthResponseType extends UserDataType {
+export interface LoginAuthDataType {
   accessToken: string;
+  tokenType: string;
+  expiresIn: number;
+  cvUserId: string;
 }
+
+export type AuthResponseType = LoginAuthDataType;
 
 export interface ForgotPasswordResponseType {
   message: string;

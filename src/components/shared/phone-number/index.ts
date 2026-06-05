@@ -9,6 +9,7 @@ export {
   DEFAULT_COUNTRY_ISO,
   DEFAULT_PHONE_LENGTH,
   getCountryOptions,
+  formatPhoneNumberForApi,
   maskPhoneNumber,
   sanitizePhoneDigits,
   SUPPORTED_COUNTRIES,

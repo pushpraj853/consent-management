@@ -1,5 +1,4 @@
 import { lazy } from "react";
-import { PERMISSIONS } from "@/constants/permissions";
 import { ProtectedRoutesType } from "../types";
 
 const MyConsents = lazy(() => import("../pages/protected/my-consents"));
@@ -18,7 +17,6 @@ export const protectedRoutes: ProtectedRoutesType[] = [
     layout: DashboardLayout,
     breadcrumb: PROTECTED_ROUTES_PATHS.MY_CONSENTS.label,
     label: PROTECTED_ROUTES_PATHS.MY_CONSENTS.label,
-    permission: PERMISSIONS.MY_CONSENTS.VIEW,
     showInSidebar: true,
   },
   {
@@ -27,7 +25,6 @@ export const protectedRoutes: ProtectedRoutesType[] = [
     layout: DashboardLayout,
     breadcrumb: PROTECTED_ROUTES_PATHS.AUDIT_TRAILS.label,
     label: PROTECTED_ROUTES_PATHS.AUDIT_TRAILS.label,
-    permission: PERMISSIONS.AUDIT_TRAILS.VIEW,
     showInSidebar: true,
   },
 ];

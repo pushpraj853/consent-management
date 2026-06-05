@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import {
+  COUNTRY_CONFIG,
+  DEFAULT_COUNTRY,
+  formatPhoneNumberForApi,
+  SupportedCountry,
+} from "@/components/shared/phone-number";
 import { LOGIN_ENDPOINT, SEND_OTP_ENDPOINT } from "@/configs/endpoints";
 import { useApiRequest } from "@/hooks";
 import { PROTECTED_ROUTES_PATHS } from "@/routes";
@@ -10,21 +16,32 @@ import { errorToast, successToast } from "@/utils";
 import Login, { LoginStep } from "../components/Login";
 
 type LoginFormData = {
-  mobile: string;
+  phoneNumber: string;
   otp: string;
 };
 
-const MOBILE_REGEX = /^[6-9]\d{9}$/;
+const INDIAN_MOBILE_REGEX = /^[6-9]\d{9}$/;
 const OTP_REGEX = /^\d{6}$/;
 const RESEND_COOLDOWN_SECONDS = 30;
 
-const validateMobile = (mobile: string): string | undefined => {
-  if (!mobile.trim()) {
+const validatePhoneNumber = (
+  phoneNumber: string,
+  country: SupportedCountry,
+): string | undefined => {
+  if (!phoneNumber.trim()) {
     return "Mobile number is required.";
   }
-  if (!MOBILE_REGEX.test(mobile)) {
+
+  const { phoneLength } = COUNTRY_CONFIG[country];
+
+  if (country === "IN" && !INDIAN_MOBILE_REGEX.test(phoneNumber)) {
     return "Please enter a valid 10-digit mobile number.";
   }
+
+  if (phoneNumber.length !== phoneLength) {
+    return `Please enter a valid ${phoneLength}-digit mobile number.`;
+  }
+
   return undefined;
 };
 
@@ -42,7 +59,8 @@ const LoginContainer = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [step, setStep] = useState<LoginStep>("mobile");
-  const [formData, setFormData] = useState<LoginFormData>({ mobile: "", otp: "" });
+  const [country, setCountry] = useState<SupportedCountry>(DEFAULT_COUNTRY);
+  const [formData, setFormData] = useState<LoginFormData>({ phoneNumber: "", otp: "" });
   const [errors, setErrors] = useState<Partial<Record<keyof LoginFormData, string>>>({});
   const [resendCooldown, setResendCooldown] = useState(0);
 
@@ -79,16 +97,23 @@ const LoginContainer = () => {
     }
   };
 
+  const handleCountryChange = (nextCountry: SupportedCountry) => {
+    setCountry(nextCountry);
+    if (errors.phoneNumber) {
+      setErrors((prev) => ({ ...prev, phoneNumber: undefined }));
+    }
+  };
+
   const completeAuthorization = (data: AuthResponseType) => {
     dispatch(
       addUserCredential({
         token: data.accessToken,
         user: {
-          id: data.id,
-          email: data.email,
-          username: data.username,
-          firstName: data.firstName,
-          lastName: data.lastName,
+          id: data.cvUserId,
+          email: "",
+          username: "",
+          firstName: "",
+          lastName: "",
         },
       }),
     );
@@ -97,14 +122,18 @@ const LoginContainer = () => {
   };
 
   const requestOtp = async () => {
-    const mobileError = validateMobile(formData.mobile);
-    if (mobileError) {
-      setErrors({ mobile: mobileError });
+    const phoneNumberError = validatePhoneNumber(formData.phoneNumber, country);
+    if (phoneNumberError) {
+      setErrors({ phoneNumber: phoneNumberError });
       return;
     }
 
+    const phoneNumber = formatPhoneNumberForApi(formData.phoneNumber, country);
+
     try {
-      await sendOtp({ payload: { mobile: formData.mobile } });
+      await sendOtp({
+        payload: { phoneNumber },
+      });
       setStep("otp");
       setResendCooldown(RESEND_COOLDOWN_SECONDS);
       setErrors({});
@@ -144,9 +173,14 @@ const LoginContainer = () => {
       return;
     }
 
+    const phoneNumber = formatPhoneNumberForApi(formData.phoneNumber, country);
+
     try {
       const response = await verifyLogin({
-        payload: { mobile: formData.mobile, otp: formData.otp },
+        payload: {
+          phoneNumber,
+          otp: formData.otp,
+        },
       });
       completeAuthorization(response.data);
     } catch (error) {
@@ -158,10 +192,12 @@ const LoginContainer = () => {
     <Login
       step={step}
       formData={formData}
+      country={country}
       errors={errors}
       loading={loading}
       resendCooldown={resendCooldown}
       onChange={handleChange}
+      onCountryChange={handleCountryChange}
       onSendOtp={handleSendOtp}
       onVerifyOtp={handleVerifyOtp}
       onResendOtp={handleResendOtp}

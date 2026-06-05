@@ -10,15 +10,17 @@ import {
 } from "@/components/ui/sidebar";
 import type { SidebarNavItem as SidebarNavItemType } from "../sidebar.utils";
 import SidebarBrand from "./SidebarBrand";
+import SidebarLogout from "./SidebarLogout";
 import SidebarMenuTrigger from "./SidebarMenuTrigger";
 import SidebarNavItem from "./SidebarNavItem";
 
 type SidebarProps = {
   homePath: string;
   items: SidebarNavItemType[];
+  onLogout: () => void;
 };
 
-const Sidebar = ({ homePath, items }: SidebarProps) => (
+const Sidebar = ({ homePath, items, onLogout }: SidebarProps) => (
   <ShadcnSidebar collapsible="icon">
     <SidebarHeader className="flex-row items-center gap-2 border-b border-sidebar-border px-2 py-3">
       <SidebarMenuTrigger />
@@ -41,6 +43,7 @@ const Sidebar = ({ homePath, items }: SidebarProps) => (
         </SidebarGroupContent>
       </SidebarGroup>
     </SidebarContent>
+    <SidebarLogout onLogout={onLogout} />
     <SidebarRail />
   </ShadcnSidebar>
 );

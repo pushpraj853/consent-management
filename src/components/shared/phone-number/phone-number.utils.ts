@@ -93,3 +93,8 @@ export const maskPhoneNumber = (mobile: string) => {
 };
 
 export const sanitizePhoneDigits = (value: string) => value.replace(/\D/g, "");
+
+export const formatPhoneNumberForApi = (
+  phoneNumber: string,
+  country: SupportedCountry,
+): string => `${COUNTRY_CONFIG[country].dialCode}${phoneNumber}`;

@@ -153,7 +153,7 @@ function useApiRequest<U>({
               url: endPointUrl,
               attachToken: endpointConfig.attachToken,
               attachXUserId: endpointConfig.attachXUserId,
-              payload,
+              payload: callPayload,
               ...requestOptions,
             });
             break;

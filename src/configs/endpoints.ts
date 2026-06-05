@@ -41,3 +41,24 @@ export const USER_LIST_ENDPOINT: EndpointConfigType = {
   attachToken: true,
   attachXUserId: false,
 };
+
+export const MANAGE_CONSENTS_ENDPOINT: EndpointConfigType = {
+  endpoint: "/manage",
+  httpType: httpType.GET,
+  attachToken: false,
+  attachXUserId: false,
+};
+
+export const REVOKE_CONSENT_ENDPOINT: EndpointConfigType = {
+  endpoint: "/manage",
+  httpType: httpType.DELETE,
+  attachToken: false,
+  attachXUserId: false,
+};
+
+export const AUDIT_TRAIL_ENDPOINT: EndpointConfigType = {
+  endpoint: "/audit",
+  httpType: httpType.GET,
+  attachToken: true,
+  attachXUserId: false,
+};

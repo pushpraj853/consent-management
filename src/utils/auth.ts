@@ -7,10 +7,30 @@ export const decodeJWTToken = (token: string) => {
   if (!token) {
     return null;
   }
-  const base64Url = token.split(".")[1];
-  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-  const decodedData = JSON.parse(window.atob(base64));
-  return decodedData;
+
+  const parts = token.split(".");
+  if (parts.length !== 3) {
+    return null;
+  }
+
+  try {
+    const base64Url = parts[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const decodedData = JSON.parse(window.atob(base64));
+    return decodedData;
+  } catch {
+    return null;
+  }
+};
+
+export const getUserId = (): string | null => {
+  const userId = store.getState()?.userCredential?.user?.id;
+
+  if (userId === null || userId === undefined || userId === "") {
+    return null;
+  }
+
+  return String(userId);
 };
 
 export const getToken = (): string | null => {
@@ -25,6 +45,11 @@ export const isUserAuthenticated = () => {
   }
 
   const tokenData = decodeJWTToken(token);
+
+  if (!tokenData?.exp) {
+    return true;
+  }
+
   const expDate = new Date(+tokenData.exp * 1000); // expire in sec. convert in msec.
 
   if (!expDate || expDate <= new Date()) {

@@ -1,30 +1,40 @@
 import { Loader2 } from "lucide-react";
-import { PhoneNumberInput } from "@/components/shared/phone-number";
+import {
+  PhoneNumberInput,
+  SupportedCountry,
+} from "@/components/shared/phone-number";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
 type LoginMobileStepProps = {
-  mobile: string;
+  phoneNumber: string;
+  country: SupportedCountry;
   error?: string;
   loading: boolean;
-  onMobileChange: (value: string) => void;
+  onPhoneNumberChange: (value: string) => void;
+  onCountryChange: (country: SupportedCountry) => void;
   onSubmit: (e: React.FormEvent) => void;
 };
 
 const LoginMobileStep = ({
-  mobile,
+  phoneNumber,
+  country,
   error,
   loading,
-  onMobileChange,
+  onPhoneNumberChange,
+  onCountryChange,
   onSubmit,
 }: LoginMobileStepProps) => (
   <form onSubmit={onSubmit} className="space-y-4">
     <div className="space-y-2">
-      <Label htmlFor="mobile">Mobile number</Label>
+      <Label htmlFor="phoneNumber">Mobile number</Label>
       <PhoneNumberInput
-        id="mobile"
-        value={mobile}
-        onChange={onMobileChange}
+        id="phoneNumber"
+        value={phoneNumber}
+        country={country}
+        countryMode="dropdown"
+        onCountryChange={onCountryChange}
+        onChange={onPhoneNumberChange}
         disabled={loading}
         autoFocus
         aria-invalid={!!error}
