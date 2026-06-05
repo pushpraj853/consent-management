@@ -1,5 +1,6 @@
+import { PUBLIC_ROUTES_PATHS } from "../routes/publicRoutes";
 import { store } from "../store";
-import { clearUserCredential } from "../store/slices/userCredentialSlice";
+import { clearUserCredential } from "../store/slices";
 import { showToast } from "./toasters";
 
 export const decodeJWTToken = (token: string) => {
@@ -38,19 +39,19 @@ export const isUserAuthenticated = () => {
 export const logout = (
   navigate?: (
     pathname: string,
-    options?: { replace?: boolean | undefined; state?: unknown }
-  ) => void
+    options?: { replace?: boolean | undefined; state?: unknown },
+  ) => void,
 ): void => {
   store.dispatch(clearUserCredential());
   localStorage.clear();
 
   if (navigate) {
-    navigate("/login", { replace: true });
+    navigate(PUBLIC_ROUTES_PATHS?.LOGIN?.path, { replace: true });
     showToast({ message: "Logged out successfully", type: "success" });
   }
   // Redirect to login page if not already there
   // This is to handle the case when the user is logged out from a different tab
-  if (!navigate && window.location.pathname !== "/login") {
-    window.location.href = "/login";
+  if (!navigate && window.location.pathname !== PUBLIC_ROUTES_PATHS?.LOGIN?.path) {
+    window.location.href = PUBLIC_ROUTES_PATHS?.LOGIN?.path;
   }
 };

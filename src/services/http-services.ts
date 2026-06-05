@@ -111,7 +111,7 @@ export const makeGetRequest = async <T>({
   const queryString = params && Object.keys(params).length > 0 ? structureQueryParams(params) : "";
 
   const response = await fetch(url + queryString, {
-    method: "GET",
+    method: httpType.GET,
     headers,
     signal,
   });
@@ -130,7 +130,7 @@ export const makePostRequest = async <T>({
   const headers = createRequestHeader(attachToken, attachXUserId);
 
   const response = await fetch(url, {
-    method: "POST",
+    method: httpType.POST,
     headers,
     body: JSON.stringify(payload),
     signal,
@@ -150,7 +150,7 @@ export const makePutRequest = async <T>({
   const headers = createRequestHeader(attachToken, attachXUserId);
 
   const response = await fetch(url, {
-    method: "PUT",
+    method: httpType.PUT,
     headers,
     body: JSON.stringify(payload),
     signal,
@@ -170,7 +170,7 @@ export const makeDeleteRequest = async <T>({
   const headers = createRequestHeader(attachToken, attachXUserId);
 
   const response = await fetch(url, {
-    method: "DELETE",
+    method: httpType.DELETE,
     headers,
     body: JSON.stringify(payload),
     signal,

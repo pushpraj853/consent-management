@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { LOGIN_ENDPOINT } from "../../api/endpoints";
+import { LOGIN_ENDPOINT } from "../../configs/endpoints";
 import useApiRequest from "../../hooks/useApiRequest";
 import { AuthResponseType } from "../../types";
 import { errorToast } from "../../utils";
@@ -48,7 +48,7 @@ const LoginPage = () => {
 
   return (
     <div>
-      Login
+      Login Page
       <button onClick={handleLogin} disabled={loading}>
         Login
       </button>

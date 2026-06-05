@@ -9,7 +9,7 @@ import {
   structureQueryParams,
 } from "../services/http-services";
 import { ApiResponse } from "./../types/index";
-import { EndpointConfigType } from "../api/endpoints";
+import { EndpointConfigType } from "../configs/endpoints";
 import { errorToast } from "../utils";
 
 interface UseApiRequestOptions {
@@ -33,11 +33,7 @@ const getErrorMessage = (error: unknown): string => {
     return error;
   }
 
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    ("message" in error || "reason" in error)
-  ) {
+  if (typeof error === "object" && error !== null && ("message" in error || "reason" in error)) {
     const { message, reason } = error as { message?: string; reason?: string };
     return message ?? reason ?? "Something went wrong.";
   }
@@ -51,7 +47,7 @@ const isAbortError = (error: unknown): boolean =>
 const buildUrl = (
   endpoint: string,
   pathParams: (string | number)[] = [],
-  queryParams: Record<string, unknown> = {}
+  queryParams: Record<string, unknown> = {},
 ): string => {
   let url = `${BASE_URL}${endpoint}`;
 
@@ -97,7 +93,7 @@ function useApiRequest<U>({
 
       throw error;
     },
-    [endpointConfig?.endpoint, showErrorToast]
+    [endpointConfig?.endpoint, showErrorToast],
   );
 
   const makeApiCall = useCallback(
@@ -107,7 +103,7 @@ function useApiRequest<U>({
         queryParams: callQueryParams = queryParams,
         payload: callPayload = payload,
       }: MakeApiCallOptions = {},
-      signal?: AbortSignal
+      signal?: AbortSignal,
     ): Promise<ApiResponse<U>> => {
       try {
         if (!endpointConfig?.endpoint) {
@@ -117,11 +113,7 @@ function useApiRequest<U>({
         setLoading(true);
         setError(null);
 
-        const endPointUrl = buildUrl(
-          endpointConfig.endpoint,
-          callPathParams,
-          callQueryParams
-        );
+        const endPointUrl = buildUrl(endpointConfig.endpoint, callPathParams, callQueryParams);
 
         let result: ApiResponse<U> | null = null;
         const requestOptions = { signal };
@@ -184,7 +176,7 @@ function useApiRequest<U>({
         }
       }
     },
-    [endpointConfig, handleError, pathParams, queryParams, payload]
+    [endpointConfig, handleError, pathParams, queryParams, payload],
   );
 
   const refetch = useCallback(
@@ -195,7 +187,7 @@ function useApiRequest<U>({
 
       return makeApiCall(options, controller.signal);
     },
-    [makeApiCall]
+    [makeApiCall],
   );
 
   useEffect(() => {

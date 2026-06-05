@@ -5,10 +5,7 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-class ErrorBoundary extends Component<
-  React.PropsWithChildren,
-  ErrorBoundaryState
-> {
+class ErrorBoundary extends Component<React.PropsWithChildren, ErrorBoundaryState> {
   state: ErrorBoundaryState = {
     hasError: false,
     error: null,

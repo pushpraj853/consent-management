@@ -1,11 +1,15 @@
 import { Fragment, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { ProtectedRoutesWrapper, PublicRoutesWrapper, AccessGuard } from "./guards";
-import { protectedRoutes, publicRoutes, sharedRoutes } from "./routes";
+import {
+  protectedRoutes,
+  publicRoutes,
+  sharedRoutes,
+  PUBLIC_ROUTES_PATHS,
+  PROTECTED_ROUTES_PATHS,
+} from "./routes";
 import { BaseRouteType } from "./types";
-import { PROTECTED_ROUTES_PATHS } from "./routes/protectedRoutes";
-import { PUBLIC_ROUTES_PATHS } from "./routes/publicRoutes";
-import ErrorBoundary from "./components/shared/ErrorBoundary";
+import { ErrorBoundary, ToasterWrapper } from "./components/shared";
 
 const App = () => {
   const renderRoutes = <T extends BaseRouteType>(routes: T[]): React.ReactNode[] => {
@@ -16,17 +20,15 @@ const App = () => {
           key={path}
           path={path}
           element={
-            userRole?.length ? (
-              <Layout>
+            <Layout>
+              {userRole?.length ? (
                 <AccessGuard allowedRoles={userRole}>
                   <Page />
                 </AccessGuard>
-              </Layout>
-            ) : (
-              <Layout>
+              ) : (
                 <Page />
-              </Layout>
-            )
+              )}
+            </Layout>
           }
         >
           {children?.length ? renderRoutes(children) : null}
@@ -39,6 +41,7 @@ const App = () => {
     <BrowserRouter>
       <ErrorBoundary>
         <Suspense fallback={<div>Loading...</div>}>
+          <ToasterWrapper />
           <Routes>
             {/* Public Routes */}
             <Route

@@ -1,3 +1,3 @@
-export { publicRoutes } from "./publicRoutes";
-export { protectedRoutes } from "./protectedRoutes";
-export { sharedRoutes } from "./sharedRoutes";
+export * from "./publicRoutes";
+export * from "./protectedRoutes";
+export * from "./sharedRoutes";
