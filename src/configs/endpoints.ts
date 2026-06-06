@@ -69,3 +69,10 @@ export const AUDIT_TRAIL_ENDPOINT: EndpointConfigType = {
   attachToken: true,
   attachXUserId: true,
 };
+
+export const CLIENT_DISPLAY_ENDPOINT: EndpointConfigType = {
+  endpoint: "/portal/client/display",
+  httpType: httpType.POST,
+  attachToken: true,
+  attachXUserId: true,
+};

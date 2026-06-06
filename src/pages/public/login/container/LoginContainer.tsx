@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   COUNTRY_CONFIG,
   DEFAULT_COUNTRY,
@@ -13,6 +13,7 @@ import { persistor, store } from "@/store";
 import { addUserCredential } from "@/store/slices";
 import { AuthResponseType, SendOtpResponseType } from "@/types";
 import { errorToast, successToast } from "@/utils";
+import { getSafeRedirectPath, REDIRECT_QUERY_PARAM } from "@/utils/redirect";
 import Login, { LoginStep } from "../components/Login";
 
 type LoginFormData = {
@@ -57,6 +58,7 @@ const validateOtp = (otp: string): string | undefined => {
 
 const LoginContainer = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState<LoginStep>("mobile");
   const [country, setCountry] = useState<SupportedCountry>(DEFAULT_COUNTRY);
   const [formData, setFormData] = useState<LoginFormData>({ phoneNumber: "", otp: "" });
@@ -107,7 +109,10 @@ const LoginContainer = () => {
     store.dispatch(addUserCredential(data));
     await persistor.flush();
     successToast("Logged in successfully");
-    navigate(PROTECTED_ROUTES_PATHS.MY_CONSENTS.path, { replace: true });
+
+    const redirect = getSafeRedirectPath(searchParams.get(REDIRECT_QUERY_PARAM));
+
+    navigate(redirect ?? PROTECTED_ROUTES_PATHS.MY_CONSENTS.path, { replace: true });
   };
 
   const requestOtp = async () => {
