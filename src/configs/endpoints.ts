@@ -56,6 +56,13 @@ export const MY_CONSENTS_ENDPOINT: EndpointConfigType = {
   attachXUserId: true,
 };
 
+export const SUBMIT_CONSENT_ENDPOINT: EndpointConfigType = {
+  endpoint: "/portal/consents",
+  httpType: httpType.POST,
+  attachToken: true,
+  attachXUserId: true,
+};
+
 export const REVOKE_CONSENT_ENDPOINT: EndpointConfigType = {
   endpoint: "/portal/consents",
   httpType: httpType.DELETE,

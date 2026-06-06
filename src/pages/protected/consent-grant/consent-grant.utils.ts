@@ -2,6 +2,7 @@ import {
   ClientDisplayDataType,
   ConsentGrantCallbackPayload,
   ConsentGrantClientType,
+  SubmitConsentPayloadType,
 } from "@/types/consent-grant";
 
 export const CONSENT_GRANT_QUERY_PARAMS = {
@@ -12,13 +13,34 @@ export const CONSENT_GRANT_QUERY_PARAMS = {
 
 export const DEFAULT_CONSENT_GRANT_FIELDS = {
   description: "has requested access to the following data:",
-  dataKeys: ["Name", "Pan Number", "email"],
+  dataKeys: ["NAME", "PAN", "CREDIT_SCORE"],
   consentDuration: 90,
+  purposeString: "Marketing",
 } as const;
 
-export const getClientTokenFromSearchParams = (
-  searchParams: URLSearchParams,
-): string | null => searchParams.get(CONSENT_GRANT_QUERY_PARAMS.CLIENT_TOKEN) ?? searchParams.get("id");
+export const buildSubmitConsentPayload = ({
+  clientToken,
+  dataKeys,
+  consentDuration,
+  consentGranted,
+  userChangedDuration = false,
+}: {
+  clientToken: string;
+  dataKeys: string[];
+  consentDuration: number;
+  consentGranted: boolean;
+  userChangedDuration?: boolean;
+}): SubmitConsentPayloadType => ({
+  clientToken,
+  purposeString: DEFAULT_CONSENT_GRANT_FIELDS.purposeString,
+  grantedDataItems: consentGranted ? [...dataKeys] : [],
+  durationDays: consentDuration,
+  userChangedDuration,
+  consentGranted,
+});
+
+export const getClientTokenFromSearchParams = (searchParams: URLSearchParams): string | null =>
+  searchParams.get(CONSENT_GRANT_QUERY_PARAMS.CLIENT_TOKEN) ?? searchParams.get("id");
 
 export const mapClientDisplayToConsentGrant = (
   display: ClientDisplayDataType,

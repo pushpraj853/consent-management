@@ -1,10 +1,15 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { CLIENT_DISPLAY_ENDPOINT } from "@/configs/endpoints";
+import { CLIENT_DISPLAY_ENDPOINT, SUBMIT_CONSENT_ENDPOINT } from "@/configs/endpoints";
 import { useApiRequest } from "@/hooks";
 import { PROTECTED_ROUTES_PATHS } from "@/routes";
-import { ClientDisplayDataType, ConsentGrantStatus } from "@/types/consent-grant";
 import {
+  ClientDisplayDataType,
+  ConsentGrantStatus,
+  SubmitConsentDataType,
+} from "@/types/consent-grant";
+import {
+  buildSubmitConsentPayload,
   completeConsentGrantFlow,
   getConsentGrantUrlContext,
   mapClientDisplayToConsentGrant,
@@ -31,6 +36,12 @@ const ConsentGrantContainer = () => {
     payload: { clientToken: clientToken ?? "" },
     dependencies: [clientToken],
     showErrorToast: false,
+  });
+
+  const { makeApiCall: submitConsent } = useApiRequest<SubmitConsentDataType>({
+    endpointConfig: SUBMIT_CONSENT_ENDPOINT,
+    hitApiOnMount: false,
+    showErrorToast: true,
   });
 
   const client = useMemo(() => {
@@ -64,24 +75,32 @@ const ConsentGrantContainer = () => {
     });
   };
 
-  const handleAllow = async () => {
-    if (!client) {
+  const submitConsentDecision = async (consentGranted: boolean) => {
+    if (!client || !clientToken) {
       return;
     }
 
     setSubmitting(true);
 
     try {
-      await new Promise((resolve) => window.setTimeout(resolve, 400));
-      finishConsentFlow("granted");
+      await submitConsent({
+        payload: buildSubmitConsentPayload({
+          clientToken,
+          dataKeys: client.dataKeys,
+          consentDuration: client.consentDuration,
+          consentGranted,
+        }),
+      });
+
+      finishConsentFlow(consentGranted ? "granted" : "denied");
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleDeny = () => {
-    finishConsentFlow("denied");
-  };
+  const handleAllow = () => submitConsentDecision(true);
+
+  const handleDeny = () => submitConsentDecision(false);
 
   const handleInvalidAction = () => {
     if (redirectUri) {

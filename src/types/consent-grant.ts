@@ -18,3 +18,18 @@ export interface ConsentGrantCallbackPayload {
   state: string | null;
   clientToken: string | null;
 }
+
+export interface SubmitConsentPayloadType {
+  clientToken: string;
+  purposeString: string;
+  grantedDataItems: string[];
+  durationDays: number;
+  userChangedDuration: boolean;
+  consentGranted: boolean;
+}
+
+export interface SubmitConsentDataType {
+  consentId: string;
+  decision: string;
+  status: string;
+}
