@@ -24,6 +24,33 @@ export interface RevokeConsentDataType {
   revokedAt: string;
 }
 
+export interface DashboardConsentItemType {
+  consentId: string;
+  cvUserId: string;
+  clientId: string;
+  noticeId: string;
+  noticeVersionId: string;
+  purposeId: string;
+  purposeName: string;
+  decision: ConsentDecision | string;
+  status: ConsentStatus | string;
+  userSelectedExpiryDays: number;
+  expiresAt: string;
+  channel: string;
+  submittedAt: string;
+  revokedAt: string | null;
+  managementUrl: string | null;
+  dataShared?: string[];
+}
+
+export interface DashboardDataType {
+  cvUserId: string;
+  totalActive: number;
+  totalRevoked: number;
+  totalExpired: number;
+  consentsByClient: Record<string, DashboardConsentItemType[]>;
+}
+
 export type AuditEventKind =
   | "CONSENT_GIVEN"
   | "CONSENT_REVOKED"

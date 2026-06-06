@@ -1,6 +1,5 @@
 import PublicLayout from "../layouts/public-layout/PublicLayout";
 import SharedPage from "../pages/shared/SharedPage";
-import ManageConsents from "../pages/shared/manage-consents";
 import { SharedRoutesType } from "../types";
 
 export const SHARED_ROUTES_PATH = {
@@ -15,12 +14,5 @@ export const sharedRoutes: SharedRoutesType[] = [
     layout: PublicLayout,
     breadcrumb: SHARED_ROUTES_PATH?.PRODUCTS?.label,
     label: SHARED_ROUTES_PATH?.PRODUCTS?.label,
-  },
-  {
-    path: SHARED_ROUTES_PATH.MANAGE_CONSENTS.path,
-    element: ManageConsents,
-    layout: PublicLayout,
-    breadcrumb: SHARED_ROUTES_PATH.MANAGE_CONSENTS.label,
-    label: SHARED_ROUTES_PATH.MANAGE_CONSENTS.label,
   },
 ];

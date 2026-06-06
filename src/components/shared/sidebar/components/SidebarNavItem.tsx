@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import type { LucideIcon } from "lucide-react";
 import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
+import SidebarNavIcon from "./SidebarNavIcon";
 
 type SidebarNavItemProps = {
   path: string;
@@ -14,8 +15,13 @@ const SidebarNavItem = ({ path, label, icon: Icon }: SidebarNavItemProps) => {
 
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton isActive={isActive} tooltip={label} render={<NavLink to={path} />}>
-        <Icon />
+      <SidebarMenuButton
+        isActive={isActive}
+        tooltip={label}
+        render={<NavLink to={path} />}
+        className="h-10 gap-3 px-2.5"
+      >
+        <SidebarNavIcon icon={Icon} />
         <span>{label}</span>
       </SidebarMenuButton>
     </SidebarMenuItem>

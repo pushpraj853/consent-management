@@ -10,7 +10,7 @@ import {
 } from "../services/http-services";
 import { ApiResponse } from "./../types/index";
 import { EndpointConfigType } from "../configs/endpoints";
-import { errorToast } from "../utils";
+import { errorToast, isUnauthorizedError } from "../utils";
 
 interface UseApiRequestOptions {
   endpointConfig: EndpointConfigType;
@@ -87,7 +87,7 @@ function useApiRequest<U>({
       console.error(`Error in ${endpointConfig?.endpoint}:`, error);
       setError(getErrorMessage(error));
 
-      if (showErrorToast) {
+      if (showErrorToast && !isUnauthorizedError(error)) {
         errorToast(error);
       }
 

@@ -3,6 +3,20 @@ import { persistor, store } from "../store";
 import { clearUserCredential } from "../store/slices";
 import { showToast } from "./toasters";
 
+export class UnauthorizedError extends Error {
+  readonly isUnauthorized = true;
+
+  constructor(message = "Unauthorized") {
+    super(message);
+    this.name = "UnauthorizedError";
+  }
+}
+
+export const isUnauthorizedError = (error: unknown): error is UnauthorizedError =>
+  error instanceof UnauthorizedError;
+
+let isHandlingUnauthorized = false;
+
 export const decodeJWTToken = (token: string) => {
   if (!token) {
     return null;
@@ -24,18 +38,17 @@ export const decodeJWTToken = (token: string) => {
 };
 
 export const getUserId = (): string | null => {
-  const userId = store.getState()?.userCredential?.user?.id;
+  const cvUserId = store.getState()?.userCredential?.cvUserId;
 
-  if (userId === null || userId === undefined || userId === "") {
+  if (!cvUserId) {
     return null;
   }
 
-  return String(userId);
+  return cvUserId;
 };
 
 export const getToken = (): string | null => {
-  const state = store.getState();
-  return state?.userCredential?.token;
+  return store.getState()?.userCredential?.accessToken ?? null;
 };
 
 export const isUserAuthenticated = () => {
@@ -59,6 +72,26 @@ export const isUserAuthenticated = () => {
   }
 
   return true;
+};
+
+export const handleUnauthorizedAccess = async (
+  message = "Unauthorized",
+): Promise<void> => {
+  if (isHandlingUnauthorized) {
+    return;
+  }
+
+  isHandlingUnauthorized = true;
+
+  showToast({ message, type: "error" });
+  store.dispatch(clearUserCredential());
+  await persistor.purge();
+
+  const loginPath = PUBLIC_ROUTES_PATHS?.LOGIN?.path;
+
+  if (window.location.pathname !== loginPath) {
+    window.location.href = loginPath;
+  }
 };
 
 export const logout = async (

@@ -1,6 +1,11 @@
 import { ApiResponse } from "./../types/index";
 import { X_API_KEY } from "../configs/envoirmentVars";
-import { decodeJWTToken, getToken, getUserId, logout } from "../utils";
+import {
+  getToken,
+  getUserId,
+  handleUnauthorizedAccess,
+  UnauthorizedError,
+} from "../utils";
 
 export enum httpType {
   GET = "GET",
@@ -35,6 +40,21 @@ type RawApiResponse<T> = {
   message?: string;
   data?: T;
   error?: boolean;
+  timestamp?: string;
+};
+
+const API_WRAPPER_KEYS = new Set(["success", "message", "error", "data", "timestamp"]);
+
+const extractResponseData = <T>(result: RawApiResponse<T>): T => {
+  if (result.data !== undefined && result.data !== null) {
+    return result.data;
+  }
+
+  const payload = Object.fromEntries(
+    Object.entries(result).filter(([key]) => !API_WRAPPER_KEYS.has(key)),
+  );
+
+  return payload as T;
 };
 
 const createRequestHeader = (attachToken = false, attachXUserId = false): Headers => {
@@ -50,13 +70,12 @@ const createRequestHeader = (attachToken = false, attachXUserId = false): Header
     headers["Authorization"] = `Bearer ${authToken}`;
 
     if (attachXUserId) {
-      const decodedToken = decodeJWTToken(authToken);
-      const userId = decodedToken?.sub?.trim() ?? getUserId();
+      const cvUserId = getUserId();
 
-      if (userId) {
-        headers["x-user-id"] = userId;
+      if (cvUserId) {
+        headers["X-User-Id"] = cvUserId;
       } else {
-        throw new Error("Error fetching x-user-id from token");
+        throw new Error("Error fetching X-User-Id from store");
       }
     }
   }
@@ -83,7 +102,7 @@ const normalizeApiResponse = <T>(result: RawApiResponse<T>): ApiResponse<T> => {
 
   if (result.success === true) {
     return {
-      data: (result.data ?? {}) as T,
+      data: extractResponseData(result),
       message: result.message ?? "OK",
       error: false,
     };
@@ -109,15 +128,15 @@ const parseErrorMessage = async (response: Response, fallback: string): Promise<
   }
 };
 
-const handleApiResponse = async <T>(
-  response: Response,
-  attachToken = false,
-): Promise<ApiResponse<T>> => {
+const handleApiResponse = async <T>(response: Response): Promise<ApiResponse<T>> => {
   if (response.status === 401) {
-    if (attachToken) {
-      logout();
+    const message = await parseErrorMessage(response, "Unauthorized");
+
+    if (getToken()) {
+      void handleUnauthorizedAccess(message);
     }
-    throw new Error(await parseErrorMessage(response, "Unauthorized access."));
+
+    throw new UnauthorizedError(message);
   }
 
   if (response.status === 403) {
@@ -156,7 +175,7 @@ export const makeGetRequest = async <T>({
     signal,
   });
 
-  return handleApiResponse<T>(response, attachToken);
+  return handleApiResponse<T>(response);
 };
 
 export const makePostRequest = async <T>({
@@ -175,7 +194,7 @@ export const makePostRequest = async <T>({
     signal,
   });
 
-  return handleApiResponse<T>(response, attachToken);
+  return handleApiResponse<T>(response);
 };
 
 export const makePutRequest = async <T>({
@@ -194,7 +213,7 @@ export const makePutRequest = async <T>({
     signal,
   });
 
-  return handleApiResponse<T>(response, attachToken);
+  return handleApiResponse<T>(response);
 };
 
 export const makeDeleteRequest = async <T>({
@@ -213,5 +232,5 @@ export const makeDeleteRequest = async <T>({
     signal,
   });
 
-  return handleApiResponse<T>(response, attachToken);
+  return handleApiResponse<T>(response);
 };

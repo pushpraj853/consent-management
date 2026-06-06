@@ -1,4 +1,4 @@
-import { ClipboardList, ScrollText, type LucideIcon } from "lucide-react";
+import { History, ShieldCheck, type LucideIcon } from "lucide-react";
 import type { PROTECTED_ROUTES_PATHS } from "@/routes/protectedRoutes";
 
 export type ProtectedRouteKey = keyof typeof PROTECTED_ROUTES_PATHS;
@@ -11,10 +11,10 @@ export type SidebarItemConfig = {
 export const SIDEBAR_ITEMS: SidebarItemConfig[] = [
   {
     routeKey: "MY_CONSENTS",
-    icon: ClipboardList,
+    icon: ShieldCheck,
   },
   {
     routeKey: "AUDIT_TRAILS",
-    icon: ScrollText,
+    icon: History,
   },
 ];

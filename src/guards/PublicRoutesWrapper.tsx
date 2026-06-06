@@ -8,8 +8,8 @@ interface PublicRoutesWrapperProps {
 }
 
 const PublicRoutesWrapper = ({ redirectRoute }: PublicRoutesWrapperProps) => {
-  const token = useSelector((state: RootState) => state.userCredential?.token);
-  const authenticated = Boolean(token) && isUserAuthenticated();
+  const accessToken = useSelector((state: RootState) => state.userCredential?.accessToken);
+  const authenticated = Boolean(accessToken) && isUserAuthenticated();
 
   return authenticated ? <Navigate replace to={redirectRoute} /> : <Outlet />;
 };

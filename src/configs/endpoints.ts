@@ -49,16 +49,23 @@ export const MANAGE_CONSENTS_ENDPOINT: EndpointConfigType = {
   attachXUserId: false,
 };
 
+export const MY_CONSENTS_ENDPOINT: EndpointConfigType = {
+  endpoint: "/portal/dashboard",
+  httpType: httpType.GET,
+  attachToken: true,
+  attachXUserId: true,
+};
+
 export const REVOKE_CONSENT_ENDPOINT: EndpointConfigType = {
-  endpoint: "/manage",
+  endpoint: "/portal/consents",
   httpType: httpType.DELETE,
-  attachToken: false,
-  attachXUserId: false,
+  attachToken: true,
+  attachXUserId: true,
 };
 
 export const AUDIT_TRAIL_ENDPOINT: EndpointConfigType = {
   endpoint: "/audit",
   httpType: httpType.GET,
   attachToken: true,
-  attachXUserId: false,
+  attachXUserId: true,
 };

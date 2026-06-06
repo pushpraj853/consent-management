@@ -84,7 +84,7 @@ const LoginOtpStep = ({
               type="button"
               onClick={onChangeNumber}
               disabled={loading}
-              className="font-medium text-primary hover:underline disabled:pointer-events-none disabled:opacity-50"
+              className="font-medium text-primary enabled:hover:underline disabled:cursor-not-allowed disabled:opacity-50"
             >
               Change number
             </button>

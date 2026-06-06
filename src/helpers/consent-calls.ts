@@ -25,13 +25,12 @@ export const getManageConsents = async (
 };
 
 export const revokeConsent = async (
-  token: string,
   consentId: string,
 ): Promise<ApiResponse<RevokeConsentDataType>> => {
   const { endpoint, attachToken, attachXUserId } = REVOKE_CONSENT_ENDPOINT;
 
   return makeDeleteRequest<RevokeConsentDataType>({
-    url: `${BASE_URL}${endpoint}/${token}/consents/${consentId}`,
+    url: `${BASE_URL}${endpoint}/${consentId}`,
     attachToken,
     attachXUserId,
   });

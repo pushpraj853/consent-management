@@ -1,24 +1,40 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import { persistReducer, persistStore } from "redux-persist";
+import {
+  FLUSH,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+  REHYDRATE,
+  persistReducer,
+  persistStore,
+} from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { userCredentialReducer, loaderDataReducer } from "./slices";
 
+const userCredentialPersistConfig = {
+  key: "userCredential",
+  storage,
+};
+
+const persistedUserCredentialReducer = persistReducer(
+  userCredentialPersistConfig,
+  userCredentialReducer,
+);
+
 const rootReducer = combineReducers({
-  userCredential: userCredentialReducer,
+  userCredential: persistedUserCredentialReducer,
   loaderData: loaderDataReducer,
 });
 
-const persistConfig = {
-  key: "root",
-  storage,
-  blacklist: ["loaderData"],
-};
-
-const persistedReducer = persistReducer(persistConfig, rootReducer);
-
 export const store = configureStore({
-  reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }),
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
 });
 
 export const persistor = persistStore(store);

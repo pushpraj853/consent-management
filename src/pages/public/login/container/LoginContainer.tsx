@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
   COUNTRY_CONFIG,
@@ -10,6 +9,7 @@ import {
 import { LOGIN_ENDPOINT, SEND_OTP_ENDPOINT } from "@/configs/endpoints";
 import { useApiRequest } from "@/hooks";
 import { PROTECTED_ROUTES_PATHS } from "@/routes";
+import { persistor, store } from "@/store";
 import { addUserCredential } from "@/store/slices";
 import { AuthResponseType, SendOtpResponseType } from "@/types";
 import { errorToast, successToast } from "@/utils";
@@ -57,7 +57,6 @@ const validateOtp = (otp: string): string | undefined => {
 
 const LoginContainer = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [step, setStep] = useState<LoginStep>("mobile");
   const [country, setCountry] = useState<SupportedCountry>(DEFAULT_COUNTRY);
   const [formData, setFormData] = useState<LoginFormData>({ phoneNumber: "", otp: "" });
@@ -104,19 +103,9 @@ const LoginContainer = () => {
     }
   };
 
-  const completeAuthorization = (data: AuthResponseType) => {
-    dispatch(
-      addUserCredential({
-        token: data.accessToken,
-        user: {
-          id: data.cvUserId,
-          email: "",
-          username: "",
-          firstName: "",
-          lastName: "",
-        },
-      }),
-    );
+  const completeAuthorization = async (data: AuthResponseType) => {
+    store.dispatch(addUserCredential(data));
+    await persistor.flush();
     successToast("Logged in successfully");
     navigate(PROTECTED_ROUTES_PATHS.MY_CONSENTS.path, { replace: true });
   };
@@ -182,7 +171,13 @@ const LoginContainer = () => {
           otp: formData.otp,
         },
       });
-      completeAuthorization(response.data);
+
+      if (!response?.data?.accessToken || !response?.data?.cvUserId) {
+        errorToast("Invalid login response. Please try again.");
+        return;
+      }
+
+      await completeAuthorization(response.data);
     } catch (error) {
       errorToast(error);
     }
