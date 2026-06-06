@@ -51,15 +51,17 @@ const MyConsents = ({
               </p>
             </div>
           ) : (
-            companyEntries.map(([companyName, consents]) => (
-              <CompanyConsentSection
-                key={companyName}
-                companyName={companyName}
-                consents={consents}
-                revoking={revoking}
-                onRevokeConsent={onRevokeConsent}
-              />
-            ))
+            <div className="flex flex-col gap-6">
+              {companyEntries.map(([companyName, consents]) => (
+                <CompanyConsentSection
+                  key={companyName}
+                  companyName={companyName}
+                  consents={consents}
+                  revoking={revoking}
+                  onRevokeConsent={onRevokeConsent}
+                />
+              ))}
+            </div>
           )}
         </>
       )}

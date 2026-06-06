@@ -1,4 +1,4 @@
-import { Menu } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
@@ -8,7 +8,8 @@ type SidebarMenuTriggerProps = {
 };
 
 const SidebarMenuTrigger = ({ className }: SidebarMenuTriggerProps) => {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, isMobile, openMobile, state } = useSidebar();
+  const isOpen = isMobile ? openMobile : state === "expanded";
 
   return (
     <Button
@@ -17,9 +18,9 @@ const SidebarMenuTrigger = ({ className }: SidebarMenuTriggerProps) => {
       size="icon-sm"
       className={cn("shrink-0", className)}
       onClick={toggleSidebar}
-      aria-label="Toggle sidebar"
+      aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
     >
-      <Menu className="size-4" />
+      {isOpen ? <X className="size-4" /> : <Menu className="size-4" />}
     </Button>
   );
 };

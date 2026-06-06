@@ -32,7 +32,7 @@ const ConsentSummaryCards = ({
     {
       label: "Expired",
       value: totalExpired,
-      accentClass: "text-muted-foreground",
+      accentClass: "text-amber-600 dark:text-amber-400",
     },
   ];
 

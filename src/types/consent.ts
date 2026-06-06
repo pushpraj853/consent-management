@@ -51,16 +51,16 @@ export interface DashboardDataType {
   consentsByClient: Record<string, DashboardConsentItemType[]>;
 }
 
-export type AuditEventKind =
-  | "CONSENT_GIVEN"
-  | "CONSENT_REVOKED"
-  | "CONSENT_EXPIRED"
-  | string;
+export type AuditEventKind = "CONSENT_GIVEN" | "CONSENT_REVOKED" | "CONSENT_EXPIRED" | string;
 
 export interface AuditEventMetadataType {
   purpose?: string;
+  accessReason?: string;
   channel?: string;
   ip?: string;
+  ipAddress?: string;
+  dataShared?: string[];
+  processor?: string;
   [key: string]: unknown;
 }
 
@@ -72,7 +72,7 @@ export interface AuditEventType {
   consentId: string;
   actorType: string;
   actorId: string;
-  metadata: AuditEventMetadataType;
+  metadata: AuditEventMetadataType | string;
   createdAt: string;
 }
 

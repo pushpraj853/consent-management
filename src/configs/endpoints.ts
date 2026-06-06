@@ -64,7 +64,7 @@ export const REVOKE_CONSENT_ENDPOINT: EndpointConfigType = {
 };
 
 export const AUDIT_TRAIL_ENDPOINT: EndpointConfigType = {
-  endpoint: "/audit",
+  endpoint: "/portal/audit",
   httpType: httpType.GET,
   attachToken: true,
   attachXUserId: true,

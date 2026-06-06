@@ -9,7 +9,7 @@ type ConsentStatusBadgeProps = {
 const STATUS_STYLES: Record<string, string> = {
   ACTIVE: "bg-success/10 text-success border-success/20",
   REVOKED: "bg-destructive/10 text-destructive border-destructive/20",
-  EXPIRED: "bg-muted text-muted-foreground border-border",
+  EXPIRED: "bg-amber-500/10 text-amber-700 border-amber-500/25 dark:text-amber-400",
 };
 
 const ConsentStatusBadge = ({ status }: ConsentStatusBadgeProps) => {

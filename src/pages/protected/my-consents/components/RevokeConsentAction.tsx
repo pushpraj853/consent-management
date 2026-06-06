@@ -22,6 +22,7 @@ type RevokeConsentActionProps = {
   companyName: string;
   revoking: boolean;
   onRevokeConsent: (consentId: string) => Promise<void>;
+  hideInactive?: boolean;
 };
 
 const formatDate = (value: string) =>
@@ -36,6 +37,7 @@ const RevokeConsentAction = ({
   companyName,
   revoking,
   onRevokeConsent,
+  hideInactive = false,
 }: RevokeConsentActionProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const status = consent.status.toUpperCase();
@@ -45,6 +47,10 @@ const RevokeConsentAction = ({
     await onRevokeConsent(consent.consentId);
     setDialogOpen(false);
   };
+
+  if (!canRevoke && hideInactive) {
+    return null;
+  }
 
   if (canRevoke) {
     return (

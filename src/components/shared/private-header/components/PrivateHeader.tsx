@@ -13,7 +13,7 @@ const PrivateHeader = ({ homePath }: PrivateHeaderProps) => {
 
   return (
     <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background px-4">
-      <SidebarMenuTrigger className="md:hidden" />
+      {isSidebarClosed ? <SidebarMenuTrigger className="md:hidden" /> : null}
       {isSidebarClosed ? <HeaderBrand homePath={homePath} /> : null}
       <div className="ml-auto flex items-center gap-2">
         <ThemeToggle />
